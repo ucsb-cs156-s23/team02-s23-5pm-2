@@ -16,4 +16,3 @@
 - [ ] There is full mutation test coverage (Pitest) for new code in
       `BookController.java`
 
-
