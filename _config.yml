@@ -23,4 +23,4 @@ repo_name: "This-should-be-overridden-by-github-actions-script"
 repo: ucsb-cs156-s23/team02-s23-5pm-2
 owner: ucsb-cs156-s23
 repo_name: team02-s23-5pm-2
-pull_requests: [{"author":{"id":"MDQ6VXNlcjU5NjY0ODg0","is_bot":false,"login":"LeonFeng0325","name":""},"headRefName":"Leon-team-prod-settup","number":63,"title":"add prod website url to README","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-2/pull/63"}]
+pull_requests: [{"author":{"id":"MDQ6VXNlcjU5NjY0ODg0","is_bot":false,"login":"LeonFeng0325","name":""},"headRefName":"Leon-team-qa-settup","number":65,"title":"update README with qa URL","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-2/pull/65"},{"author":{"id":"MDQ6VXNlcjU5NjY0ODg0","is_bot":false,"login":"LeonFeng0325","name":""},"headRefName":"Leon-team-prod-settup","number":63,"title":"add prod website url to README","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-2/pull/63"}]
