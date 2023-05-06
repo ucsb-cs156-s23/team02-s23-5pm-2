@@ -19,18 +19,18 @@ import lombok.Builder;
 @Entity(name = "student")
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @NotNull
     private String firstName;
-    
+
     @NotNull
     private String lastName;
 
     @NotNull
     @Column(unique=true)
-    private long perm;
+    private String perm;
 
     @NotNull
     @Column(unique=true)
