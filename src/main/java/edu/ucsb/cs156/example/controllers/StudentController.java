@@ -1,12 +1,15 @@
 package edu.ucsb.cs156.example.controllers;
 
 import edu.ucsb.cs156.example.entities.Student;
+import edu.ucsb.cs156.example.errors.EntityNotFoundException;
 import edu.ucsb.cs156.example.repositories.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import javax.validation.Valid;
 
 
 
@@ -54,5 +58,36 @@ public class StudentController extends ApiController{
  
         Student savedStudent = studentRepository.save(student);
         return savedStudent;
+    }
+
+    @ApiOperation(value="Get a single student")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("")
+    public Student getById(
+        @ApiParam("id") @RequestParam Long id
+    ) {
+        Student student = studentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Student.class, id));
+
+        return student;
+    }
+
+    @ApiOperation(value="Update a single student")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("")
+    public Student updateStudent(
+        @ApiParam("id") @RequestParam Long id,
+        @RequestBody @Valid Student incoming) {
+
+        Student student = studentRepository.findById(id).orElseThrow(()-> new EntityNotFoundException(Student.class, id));
+        student.setFirstName(incoming.getFirstName());
+
+        student.setLastName(incoming.getLastName());
+        student.setPerm(incoming.getPerm());
+        student.setEmail(incoming.getEmail());
+        student.setMajor(incoming.getMajor());
+        student.setPhoneNumber(incoming.getPhoneNumber());
+
+        studentRepository.save(student);
+        return student;
     }
 }
