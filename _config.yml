@@ -23,4 +23,4 @@ repo_name: "TBD"
 repo: ucsb-cs156-s23/team02-s23-5pm-2
 owner: ucsb-cs156-s23
 repo_name: team02-s23-5pm-2
-pull_requests: [{"author":{"id":"MDQ6VXNlcjU2MDUxNjQ2","is_bot":false,"login":"AlejandroRR16","name":""},"headRefName":"Alejandro-create-db-table-student","number":70,"title":"ARR - Added Vehicle's database table","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-2/pull/70"}]
+pull_requests: [{"author":{"id":"MDQ6VXNlcjU5NjY0ODg0","is_bot":false,"login":"LeonFeng0325","name":""},"headRefName":"Leon-get-post-index-controller","number":71,"title":"add controller to post and list all students and related unit test","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-2/pull/71"},{"author":{"id":"MDQ6VXNlcjU2MDUxNjQ2","is_bot":false,"login":"AlejandroRR16","name":""},"headRefName":"Alejandro-create-db-table-student","number":70,"title":"ARR - Added Vehicle's database table","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-2/pull/70"}]
