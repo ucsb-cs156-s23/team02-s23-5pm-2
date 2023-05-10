@@ -36,9 +36,6 @@ public class Student {
     @Column(unique=true)
     private String email;
 
-    @NotNull
     private String phoneNumber;
-
-    @NotNull
     private String major;
 }
