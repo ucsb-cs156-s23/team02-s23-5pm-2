@@ -24,7 +24,7 @@ import javax.validation.Valid;
 
 
 @Api(description="Energy Drink")
-@RequestMapping("/api/energydrinks")
+@RequestMapping("/api/energydrink")
 @RestController
 public class EnergyDrinkController extends ApiController{
     @Autowired
@@ -33,7 +33,7 @@ public class EnergyDrinkController extends ApiController{
     @ApiOperation(value="List all energy drinks")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/all")
-    public Iterable<EnergyDrink> allEnergyDrinks(){
+    public Iterable<EnergyDrink> allEnergyDrink(){
         Iterable<EnergyDrink> energydrinks = energydrinkRepository.findAll();
         return energydrinks;
     }
