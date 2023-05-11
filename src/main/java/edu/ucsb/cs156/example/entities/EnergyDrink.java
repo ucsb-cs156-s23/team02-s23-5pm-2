@@ -23,12 +23,12 @@ public class EnergyDrink {
     private long id;
 
     @NotNull
-    private String Name;
+    private String name;
 
     @NotNull
-    private String Description;
+    private String flavor;
 
     @NotNull
     @Column(unique=true)
-    private int Calories;
+    private String calories;
 }
