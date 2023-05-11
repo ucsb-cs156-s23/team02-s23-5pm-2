@@ -23,4 +23,4 @@ repo_name: "TBD"
 repo: ucsb-cs156-s23/team02-s23-5pm-2
 owner: ucsb-cs156-s23
 repo_name: team02-s23-5pm-2
-pull_requests: [{"author":{"id":"MDQ6VXNlcjc3NzA5OTIx","is_bot":false,"login":"Simon-Lai103","name":""},"headRefName":"Simon-EnergyDrinkDatabase","number":76,"title":"sl - added issue11 EnergyDrink","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-2/pull/76"}]
+pull_requests: [{"author":{"id":"MDQ6VXNlcjU2MDUxNjQ2","is_bot":false,"login":"AlejandroRR16","name":""},"headRefName":"Alejandro-vehicle-controller","number":77,"title":"Alejandro vehicle controller","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-2/pull/77"},{"author":{"id":"MDQ6VXNlcjc3NzA5OTIx","is_bot":false,"login":"Simon-Lai103","name":""},"headRefName":"Simon-EnergyDrinkDatabase","number":76,"title":"sl - added issue11 EnergyDrink","url":"https://github.com/ucsb-cs156-s23/team02-s23-5pm-2/pull/76"}]
