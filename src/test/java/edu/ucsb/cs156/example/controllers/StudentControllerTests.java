@@ -25,6 +25,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -239,6 +240,61 @@ public class StudentControllerTests extends ControllerTestCase  {
         Map<String, Object> json = responseToJson(response);
         assertEquals("Student with id 1 not found", json.get("message"));
     }
+
+    @WithMockUser(roles = { "ADMIN", "USER" })
+    @Test
+    public void admin_can_delete_a_student() throws Exception {
+        Student student = Student.builder()
+                .firstName("Anthony")
+                .lastName("Davis")
+                .perm("67891")
+                .email("aDavis@ucsb.edu")
+                .phoneNumber("673-38386")
+                .major("Math").build();
+        
+        when(studentRepository.findById(eq(15L))).thenReturn(Optional.of(student));
+
+        // act
+        MvcResult response = mockMvc.perform(
+        delete("/api/students?id=15")
+                        .with(csrf()))
+        .andExpect(status().isOk()).andReturn();
+
+        // assert
+        verify(studentRepository, times(1)).findById(15L);
+        verify(studentRepository, times(1)).delete(any());
+
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("Student with id 15 deleted", json.get("message"));
+    }
+
+    @WithMockUser(roles = { "ADMIN", "USER" })
+    @Test
+    public void admin_tries_to_delete_non_existant_student_and_gets_right_error_message() throws Exception {
+        when(studentRepository.findById(eq(15L))).thenReturn(Optional.empty());
+         // act
+        MvcResult response = mockMvc.perform(
+        delete("/api/students?id=15")
+                        .with(csrf()))
+        .andExpect(status().isNotFound()).andReturn();
+
+        // assert
+        verify(studentRepository, times(1)).findById(15L);
+        Map<String, Object> json = responseToJson(response);
+        assertEquals("Student with id 15 not found", json.get("message"));
+
+
+
+
+
+
+
+
+    }
+
+
+
+
 
 
 }
