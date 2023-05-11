@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @Api(description = "Restaurant")
-@RequestMapping("/api/restaurant")
+@RequestMapping("/api/restaurants")
 @RestController
 @Slf4j
 public class RestaurantController extends ApiController {
@@ -35,7 +35,7 @@ public class RestaurantController extends ApiController {
     @ApiOperation(value = "List all restaurants")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/all")
-    public Iterable<Restaurant> allRestaurants() {
+    public Iterable<Restaurant> allRestaurantss() {
         Iterable<Restaurant> restaurants = restaurantRepository.findAll();
         return restaurants;
     }
@@ -82,10 +82,10 @@ public class RestaurantController extends ApiController {
         return genericMessage("Restaurant with id %s deleted".formatted(id));
     }
 
-    @ApiOperation(value = "Update a single restaurant")
+    @ApiOperation(value = "Update a single restaurants")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("")
-    public Restaurant updateRestaurant(
+    public Restaurant updateRestaurants(
             @ApiParam("id") @RequestParam Long id,
             @RequestBody @Valid Restaurant incoming) {
 

@@ -198,7 +198,7 @@ public class RestaurantControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/restaurants/post?name=Zocalo&location=901 Embarcadero del Mar&hasTakeOut=2022-01-03T00:00:00")
+                                post("/api/restaurants/post?name=Zocalo&location=901 Embarcadero del Mar&hasTakeOut=true")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
@@ -268,7 +268,7 @@ public class RestaurantControllerTests extends ControllerTestCase {
                 Restaurant restaurantEdited = Restaurant.builder()
                                 .name("VONS Chicken")
                                 .location("955 Embarcadero del Mar")
-                                .hasTakeOut(true)
+                                .hasTakeOut(false)
                                 .build();
 
                 String requestBody = mapper.writeValueAsString(restaurantEdited);
