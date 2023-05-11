@@ -26,9 +26,9 @@ public class EnergyDrink {
     private String name;
 
     @NotNull
-    private String description;
+    private String flavor;
 
     @NotNull
     @Column(unique=true)
-    private int calories;
+    private String calories;
 }
