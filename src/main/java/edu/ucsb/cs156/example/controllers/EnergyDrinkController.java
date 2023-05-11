@@ -61,7 +61,7 @@ public class EnergyDrinkController extends ApiController{
     public EnergyDrink getById(
         @ApiParam("id") @RequestParam Long id
     ) {
-        EnergyDrink energydrink = energydrinkRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Energy_drink.class, id));
+        EnergyDrink energydrink = energydrinkRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(EnergyDrink.class, id));
 
         return energydrink;
     }
