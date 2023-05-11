@@ -125,7 +125,7 @@ public class EnergyDrinkControllerTests extends ControllerTestCase {
                 verify(energydrinkRepository, times(1)).findById(eq(7L));
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("EntityNotFoundException", json.get("type"));
-                assertEquals("Energy drink with id 7 not found", json.get("message"));
+                assertEquals("EnergyDrink with id 7 not found", json.get("message"));
         }
 
         @WithMockUser(roles = { "USER" })

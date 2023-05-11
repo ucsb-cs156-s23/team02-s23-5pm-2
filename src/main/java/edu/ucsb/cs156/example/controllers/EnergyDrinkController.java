@@ -92,6 +92,6 @@ public class EnergyDrinkController extends ApiController{
                 .orElseThrow(()-> new EntityNotFoundException(EnergyDrink.class, id));
         
         energydrinkRepository.delete(energydrink);
-        return genericMessage("Energy drink with id %s deleted".formatted(id));
+        return genericMessage("EnergyDrink with id %s deleted".formatted(id));
     }
 }
