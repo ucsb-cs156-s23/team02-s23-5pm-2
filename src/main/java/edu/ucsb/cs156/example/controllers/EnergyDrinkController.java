@@ -44,7 +44,7 @@ public class EnergyDrinkController extends ApiController{
     public EnergyDrink postEnergyDrink(
         @ApiParam("name") @RequestParam String name,
         @ApiParam("flavor") @RequestParam String flavor,
-        @ApiParam("calories") @RequestParam int calories
+        @ApiParam("calories") @RequestParam String calories
     ) throws JsonProcessingException {
         EnergyDrink energydrink = new EnergyDrink();
         energydrink.setName(name);
