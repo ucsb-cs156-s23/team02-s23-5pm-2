@@ -100,7 +100,7 @@ public class MoviesControllerTests extends ControllerTestCase {
                 // assert
 
                 verify(movieRepository, times(1)).findById(eq(1L));
-                String expectedJson = mapper.writeValueAsString(response);
+                String expectedJson = mapper.writeValueAsString(movie);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
@@ -166,7 +166,7 @@ public class MoviesControllerTests extends ControllerTestCase {
                 // arrange
 
                 Movie movie = Movie.builder()
-                        .directorName("James")
+                        .directorName("James Cameron")
                         .movieName("Avatar")
                         .releaseDate("2009-12-18")
                         .build();
@@ -176,7 +176,7 @@ public class MoviesControllerTests extends ControllerTestCase {
                 when(movieRepository.save(eq(movie))).thenReturn(movie);
 
                 // act
-                MvcResult response = mockMvc.perform(post("/api/movie/post?directorName=James&movieName=Avatar&releaseDate=2009-12-08")
+                MvcResult response = mockMvc.perform(post("/api/movie/post?directorName=James Cameron&movieName=Avatar&releaseDate=2009-12-18")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
@@ -255,7 +255,6 @@ public class MoviesControllerTests extends ControllerTestCase {
                
 
                 String requestBody = mapper.writeValueAsString(movieEdit);
-
                 when(movieRepository.findById(eq(1L))).thenReturn(Optional.of(movieOrig));
 
                 // act

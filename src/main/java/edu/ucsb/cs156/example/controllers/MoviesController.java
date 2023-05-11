@@ -61,7 +61,7 @@ public class MoviesController extends ApiController {
         Movie movie = new Movie();
         movie.setMovieName(movieName);
         movie.setDirectorName(directorName);
-        movie.setReleaseDate(null);
+        movie.setReleaseDate(releaseDate);
 
         Movie savedMovie = movieRepository.save(movie);
         return savedMovie;
