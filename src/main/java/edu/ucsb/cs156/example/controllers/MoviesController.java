@@ -6,7 +6,6 @@ import edu.ucsb.cs156.example.repositories.MovieRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,17 +24,16 @@ import javax.validation.Valid;
 @Api(description = "Movie")
 @RequestMapping("/api/movie")
 @RestController
-@Slf4j
 public class MoviesController extends ApiController {
 
     @Autowired
-    MovieRepository MovieRepository;
+    MovieRepository movieRepository;
 
     @ApiOperation(value = "List all movies")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/all")
     public Iterable<Movie> allMovie() {
-        Iterable<Movie> movies = MovieRepository.findAll();
+        Iterable<Movie> movies = movieRepository.findAll();
         return movies;
     }
 
@@ -43,73 +41,59 @@ public class MoviesController extends ApiController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("")
     public Movie getById(
-            @ApiParam("code") @RequestParam String code) {
-        Movie movies = MovieRepository.findById(code)
-                .orElseThrow(() -> new EntityNotFoundException(Movie.class, code));
+            @ApiParam("code") @RequestParam Long id) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Movie.class, id));
 
-        return movies;
+        return movie;
     }
 
     @ApiOperation(value = "Create a new movie")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/post")
     public Movie postMovie(
-        @ApiParam("code") @RequestParam String code,
-        @ApiParam("name") @RequestParam String name,
-        @ApiParam("isAction") @RequestParam boolean isAction,
-        @ApiParam("isHorror") @RequestParam boolean isHorror,
-        @ApiParam("isComedy") @RequestParam boolean isComedy,
-        @ApiParam("rottenTomatoesScore") @RequestParam double rottenTomatoesScore,
-        @ApiParam("criticScore") @RequestParam double criticScore
-        )
+        @ApiParam("movieName") @RequestParam String movieName,
+        @ApiParam("directorName") @RequestParam String directorName,
+        @ApiParam("releaseDate. e.g. YYYY-mm-dd") @RequestParam String releaseDate
+    )
         {
 
-        Movie movies = new Movie();
-        commons.setCode(code);
-        commons.setName(name);
-        commons.setIsAction(isAction);
-        commons.setIsHorror(isHorror);
-        commons.setIsComedy(isComedy);
-        commons.setRottenTomatoesScore(rottenTomatoesScore);
-        commons.setCriticScore(criticScore);
+        Movie movie = new Movie();
+        movie.setMovieName(movieName);
+        movie.setDirectorName(directorName);
+        movie.setReleaseDate(null);
 
-        Movie movies = movieRepository.save(movies);
-
-        return movies;
+        Movie savedMovie = movieRepository.save(movie);
+        return savedMovie;
     }
 
     @ApiOperation(value = "Delete a Movie")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("")
     public Object deleteMovie(
-            @ApiParam("code") @RequestParam String code) {
-        Movie movie = movieRepository.findById(code)
-                .orElseThrow(() -> new EntityNotFoundException(Movie.class, code));
+            @ApiParam("id") @RequestParam Long id) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Movie.class, id));
 
-        movieRepository.delete(movies);
-        return genericMessage("<Movie> with id %s deleted".formatted(code));
+        movieRepository.delete(movie);
+        return genericMessage("Movie with id %s deleted".formatted(id));
     }
 
     @ApiOperation(value = "Update a single movie")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("")
     public Movie updateMovie(
-            @ApiParam("code") @RequestParam String code,
+            @ApiParam("id") @RequestParam Long id,
             @RequestBody @Valid Movie incoming) {
 
-        Movie movie = movieRepository.findById(code)
-                .orElseThrow(() -> new EntityNotFoundException(Movie.class, code));
-
-
-        commons.setName(incoming.getName());  
-        commons.setIsAction(incoming.getIsAction());
-        commons.setIsHorror(incoming.getIsHorror());
-        commons.setIsComedy(incoming.getIsComedy());
-        commons.setRottenTomatoesScore(incoming.getRottenTomatoesScore());
-        commons.setCriticScore(incoming.getCriticScore());
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Movie.class, id));
+        
+        movie.setDirectorName(incoming.getDirectorName());
+        movie.setMovieName(incoming.getMovieName());
+        movie.setReleaseDate(incoming.getReleaseDate());
 
         movieRepository.save(movie);
-
         return movie;
     }
 }

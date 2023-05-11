@@ -4,7 +4,8 @@ import edu.ucsb.cs156.example.repositories.UserRepository;
 import edu.ucsb.cs156.example.testconfig.TestConfig;
 import edu.ucsb.cs156.example.ControllerTestCase;
 import edu.ucsb.cs156.example.entities.Movie;
-import edu.ucsb.cs156.example.repositories.Movie;
+import edu.ucsb.cs156.example.repositories.MovieRepository;
+import edu.ucsb.cs156.example.repositories.StudentRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@WebMvcTest(controllers = MovieController.class)
+@WebMvcTest(controllers = MoviesController.class)
 @Import(TestConfig.class)
 public class MoviesControllerTests extends ControllerTestCase {
 
@@ -38,10 +39,9 @@ public class MoviesControllerTests extends ControllerTestCase {
         MovieRepository movieRepository;
 
         @MockBean
-        UserRepository movieRepository;
+        UserRepository userRepository;
 
-        // Authorization tests for /api/ucsbdiningcommons/admin/all
-
+        
         @Test
         public void logged_out_users_cannot_get_all() throws Exception {
                 mockMvc.perform(get("/api/movie/all"))
@@ -57,7 +57,7 @@ public class MoviesControllerTests extends ControllerTestCase {
 
         @Test
         public void logged_out_users_cannot_get_by_id() throws Exception {
-                mockMvc.perform(get("/api/movie?code=carrillo"))
+                mockMvc.perform(get("/api/movie?id=1"))
                                 .andExpect(status().is(403)); // logged out users can't get by id
         }
 
@@ -86,25 +86,21 @@ public class MoviesControllerTests extends ControllerTestCase {
                 // arrange
 
                 Movie movie = Movie.builder()
-                                .name("Titanic")
-                                .code("titanic")
-                                .isAction(false)
-                                .isHorror(false)
-                                .isComedy(true)
-                                .setRottenTomatoesScore(10)
-                                .setCriticsScore(20)
-                                .build();
+                        .directorName("James Cameron")
+                        .movieName("Avatar")
+                        .releaseDate("2009-12-18")
+                        .build();
 
-                when(movieRepository.findById(eq("titanic"))).thenReturn(Optional.of(movie));
+                when(movieRepository.findById(eq(1L))).thenReturn(Optional.of(movie));
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsbdiningcommons?code=titanic"))
+                MvcResult response = mockMvc.perform(get("/api/movie?id=1"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
 
-                verify(ucsbDiningCommonsRepository, times(1)).findById(eq("carrillo"));
-                String expectedJson = mapper.writeValueAsString(commons);
+                verify(movieRepository, times(1)).findById(eq(1L));
+                String expectedJson = mapper.writeValueAsString(response);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
@@ -115,122 +111,108 @@ public class MoviesControllerTests extends ControllerTestCase {
 
                 // arrange
 
-                when(ucsbDiningCommonsRepository.findById(eq("munger-hall"))).thenReturn(Optional.empty());
+                when(movieRepository.findById(eq(1L))).thenReturn(Optional.empty());
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsbdiningcommons?code=munger-hall"))
+                MvcResult response = mockMvc.perform(get("/api/movie?id=1"))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
 
-                verify(ucsbDiningCommonsRepository, times(1)).findById(eq("munger-hall"));
+                verify(movieRepository, times(1)).findById(eq(1L));
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("EntityNotFoundException", json.get("type"));
-                assertEquals("UCSBDiningCommons with id munger-hall not found", json.get("message"));
+                assertEquals("Movie with id 1 not found", json.get("message"));
         }
 
         @WithMockUser(roles = { "USER" })
         @Test
-        public void logged_in_user_can_get_all_ucsbdiningcommons() throws Exception {
+        public void logged_in_user_can_get_all_movies() throws Exception {
 
                 // arrange
 
-                UCSBDiningCommons carrillo = UCSBDiningCommons.builder()
-                                .name("Carrillo")
-                                .code("carrillo")
-                                .hasSackMeal(false)
-                                .hasTakeOutMeal(false)
-                                .hasDiningCam(true)
-                                .latitude(34.409953)
-                                .longitude(-119.85277)
-                                .build();
+                Movie movie1 = Movie.builder()
+                        .directorName("Christopher Nolan")
+                        .movieName("Inception")
+                        .releaseDate("2011-07-13")
+                        .build();
+        
+                Movie movie2 = Movie.builder()
+                        .directorName("James Cameron")
+                        .movieName("Avatar")
+                        .releaseDate("2009-12-18")
+                        .build();
 
-                UCSBDiningCommons dlg = UCSBDiningCommons.builder()
-                                .name("De La Guerra")
-                                .code("de-la-guerra")
-                                .hasSackMeal(false)
-                                .hasTakeOutMeal(false)
-                                .hasDiningCam(true)
-                                .latitude(34.409811)
-                                .longitude(-119.845026)
-                                .build();
+                ArrayList<Movie> expectedMovies = new ArrayList<>();
+                expectedMovies.addAll(Arrays.asList(movie1, movie2));
 
-                ArrayList<UCSBDiningCommons> expectedCommons = new ArrayList<>();
-                expectedCommons.addAll(Arrays.asList(carrillo, dlg));
-
-                when(ucsbDiningCommonsRepository.findAll()).thenReturn(expectedCommons);
+                when(movieRepository.findAll()).thenReturn(expectedMovies);
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/ucsbdiningcommons/all"))
+                MvcResult response = mockMvc.perform(get("/api/movie/all"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
 
-                verify(ucsbDiningCommonsRepository, times(1)).findAll();
-                String expectedJson = mapper.writeValueAsString(expectedCommons);
+                verify(movieRepository, times(1)).findAll();
+                String expectedJson = mapper.writeValueAsString(expectedMovies);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void an_admin_user_can_post_a_new_commons() throws Exception {
+        public void an_admin_user_can_post_a_new_movie() throws Exception {
                 // arrange
 
-                UCSBDiningCommons ortega = UCSBDiningCommons.builder()
-                                .name("Ortega")
-                                .code("ortega")
-                                .hasSackMeal(true)
-                                .hasTakeOutMeal(true)
-                                .hasDiningCam(true)
-                                .latitude(34.410987)
-                                .longitude(-119.84709)
-                                .build();
+                Movie movie = Movie.builder()
+                        .directorName("James")
+                        .movieName("Avatar")
+                        .releaseDate("2009-12-18")
+                        .build();
 
-                when(ucsbDiningCommonsRepository.save(eq(ortega))).thenReturn(ortega);
+
+
+                when(movieRepository.save(eq(movie))).thenReturn(movie);
 
                 // act
-                MvcResult response = mockMvc.perform(
-                                post("/api/ucsbdiningcommons/post?name=Ortega&code=ortega&hasSackMeal=true&hasTakeOutMeal=true&hasDiningCam=true&latitude=34.410987&longitude=-119.84709")
+                MvcResult response = mockMvc.perform(post("/api/movie/post?directorName=James&movieName=Avatar&releaseDate=2009-12-08")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
-                verify(ucsbDiningCommonsRepository, times(1)).save(ortega);
-                String expectedJson = mapper.writeValueAsString(ortega);
+                verify(movieRepository, times(1)).save(movie);
+                String expectedJson = mapper.writeValueAsString(movie);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_can_delete_a_date() throws Exception {
-                // arrange
+        public void admin_can_delete_a_movie() throws Exception {
+                // 
+                Movie movie = Movie.builder()
+                        .directorName("James")
+                        .movieName("Avatar")
+                        .releaseDate("2009-12-18")
+                        .build();
 
-                UCSBDiningCommons portola = UCSBDiningCommons.builder()
-                                .name("Portola")
-                                .code("portola")
-                                .hasSackMeal(true)
-                                .hasTakeOutMeal(true)
-                                .hasDiningCam(true)
-                                .latitude(34.417723)
-                                .longitude(-119.867427)
-                                .build();
+      
 
-                when(ucsbDiningCommonsRepository.findById(eq("portola"))).thenReturn(Optional.of(portola));
+                when(movieRepository.findById(eq(1L))).thenReturn(Optional.of(movie));
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/ucsbdiningcommons?code=portola")
+                                delete("/api/movie?id=1")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
-                verify(ucsbDiningCommonsRepository, times(1)).findById("portola");
-                verify(ucsbDiningCommonsRepository, times(1)).delete(any());
+                verify(movieRepository, times(1)).findById(1L);
+                verify(movieRepository, times(1)).delete(any());
 
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("UCSBDiningCommons with id portola deleted", json.get("message"));
+                assertEquals("Movie with id 1 deleted", json.get("message"));
         }
 
         @WithMockUser(roles = { "ADMIN", "USER" })
@@ -239,97 +221,87 @@ public class MoviesControllerTests extends ControllerTestCase {
                         throws Exception {
                 // arrange
 
-                when(ucsbDiningCommonsRepository.findById(eq("munger-hall"))).thenReturn(Optional.empty());
+                when(movieRepository.findById(eq(1L))).thenReturn(Optional.empty());
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/ucsbdiningcommons?code=munger-hall")
+                                delete("/api/movie?id=1")
                                                 .with(csrf()))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
-                verify(ucsbDiningCommonsRepository, times(1)).findById("munger-hall");
+                verify(movieRepository, times(1)).findById(1L);
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("UCSBDiningCommons with id munger-hall not found", json.get("message"));
+                assertEquals("Movie with id 1 not found", json.get("message"));
         }
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_can_edit_an_existing_commons() throws Exception {
+        public void admin_can_edit_an_existing_movie() throws Exception {
                 // arrange
 
-                UCSBDiningCommons carrilloOrig = UCSBDiningCommons.builder()
-                                .name("Carrillo")
-                                .code("carrillo")
-                                .hasSackMeal(false)
-                                .hasTakeOutMeal(false)
-                                .hasDiningCam(true)
-                                .latitude(34.409953)
-                                .longitude(-119.85277)
-                                .build();
+                Movie movieOrig = Movie.builder()
+                        .directorName("Christopher Nolan")
+                        .movieName("Inception")
+                        .releaseDate("2011-07-13")
+                        .build();
+        
+                Movie movieEdit = Movie.builder()
+                        .directorName("James Cameron")
+                        .movieName("Avatar")
+                        .releaseDate("2009-12-18")
+                        .build();
 
-                UCSBDiningCommons carrilloEdited = UCSBDiningCommons.builder()
-                                .name("Carrillo Dining Hall")
-                                .code("carrillo")
-                                .hasSackMeal(true)
-                                .hasTakeOutMeal(true)
-                                .hasDiningCam(false)
-                                .latitude(34.409954)
-                                .longitude(-119.85278)
-                                .build();
+               
 
-                String requestBody = mapper.writeValueAsString(titanicEdited);
+                String requestBody = mapper.writeValueAsString(movieEdit);
 
-                when(movieRepository.findById(eq("titanic"))).thenReturn(Optional.of(titanicOrig));
+                when(movieRepository.findById(eq(1L))).thenReturn(Optional.of(movieOrig));
 
                 // act
-                MvcResult response = mockMvc.perform(
-                                put("/api/movie?code=titanic")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .characterEncoding("utf-8")
-                                                .content(requestBody)
-                                                .with(csrf()))
-                                .andExpect(status().isOk()).andReturn();
+                MvcResult response = mockMvc.perform(put("/api/movie?id=1")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .characterEncoding("utf-8")
+                                        .content(requestBody)
+                                        .with(csrf()))
+                                        .andExpect(status().isOk()).andReturn();
 
                 // assert
-                verify(movieRepository, times(1)).findById("carrillo");
-                verify(movieRepository, times(1)).save(carrilloEdited); // should be saved with updated info
+                verify(movieRepository, times(1)).findById(1L);
+                verify(movieRepository, times(1)).save(movieEdit); // should be saved with updated info
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(requestBody, responseString);
         }
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_cannot_edit_commons_that_does_not_exist() throws Exception {
+        public void admin_cannot_edit_movie_that_does_not_exist() throws Exception {
                 // arrange
+                Movie movieEdit = Movie.builder()
+                .directorName("James Cameron")
+                .movieName("Avatar")
+                .releaseDate("2009-12-18")
+                .build();
 
-                UCSBDiningCommons editedCommons = UCSBDiningCommons.builder()
-                                .name("Munger Hall")
-                                .code("munger-hall")
-                                .hasSackMeal(false)
-                                .hasTakeOutMeal(false)
-                                .hasDiningCam(true)
-                                .latitude(34.420799)
-                                .longitude(-119.852617)
-                                .build();
+              
 
-                String requestBody = mapper.writeValueAsString(editedCommons);
+                String requestBody = mapper.writeValueAsString(movieEdit);
 
-                when(ucsbDiningCommonsRepository.findById(eq("munger-hall"))).thenReturn(Optional.empty());
+                when(movieRepository.findById(eq(1L))).thenReturn(Optional.empty());
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/ucsbdiningcommons?code=munger-hall")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .characterEncoding("utf-8")
-                                                .content(requestBody)
-                                                .with(csrf()))
-                                .andExpect(status().isNotFound()).andReturn();
+                                put("/api/movie?id=1")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .characterEncoding("utf-8")
+                                        .content(requestBody)
+                                        .with(csrf()))
+                                        .andExpect(status().isNotFound()).andReturn();
 
                 // assert
-                verify(ucsbDiningCommonsRepository, times(1)).findById("munger-hall");
+                verify(movieRepository, times(1)).findById(1L);
                 Map<String, Object> json = responseToJson(response);
-                assertEquals("UCSBDiningCommons with id munger-hall not found", json.get("message"));
+                assertEquals("Movie with id 1 not found", json.get("message"));
 
         }
 }
