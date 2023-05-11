@@ -33,7 +33,7 @@ public class EnergyDrinkController extends ApiController{
     @ApiOperation(value="List all energy drinks")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/all")
-    public Iterable<EnergyDrink> allEnergyDrink(){
+    public Iterable<EnergyDrink> allEnergyDrinks(){
         Iterable<EnergyDrink> energydrinks = energydrinkRepository.findAll();
         return energydrinks;
     }
@@ -61,7 +61,7 @@ public class EnergyDrinkController extends ApiController{
     public EnergyDrink getById(
         @ApiParam("id") @RequestParam Long id
     ) {
-        EnergyDrink energydrink = energydrinkRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(EnergyDrink.class, id));
+        EnergyDrink energydrink = energydrinkRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Energy_drink.class, id));
 
         return energydrink;
     }

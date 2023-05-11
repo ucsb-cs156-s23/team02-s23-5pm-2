@@ -182,7 +182,7 @@ public class EnergyDrinkControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/energydrink/post?name=Red_Bull&flavor=Peach&calories=150")
+                                post("/api/energydrink/post?name=Red Bull&flavor=Peach&calories=150")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
