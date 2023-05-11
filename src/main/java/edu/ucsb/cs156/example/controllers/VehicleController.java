@@ -3,7 +3,6 @@ package edu.ucsb.cs156.example.controllers;
 import edu.ucsb.cs156.example.entities.Vehicle;
 import edu.ucsb.cs156.example.errors.EntityNotFoundException;
 import edu.ucsb.cs156.example.repositories.VehicleRepository;
-import edu.ucsb.cs156.example.repositories.UCSBDateRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -12,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+
+import java.time.LocalDateTime;
 
 @Api(description = "Vehicle")
 @RequestMapping("/api/vehicle")
@@ -54,24 +56,26 @@ public class VehicleController extends ApiController {
     @ApiOperation(value = "Create a new vehicle")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/post")
-    public Vehicle postCommons(
+    public Vehicle postVehicle(
         @ApiParam("brand") @RequestParam String brand,
         @ApiParam("model") @RequestParam String model,
-        @ApiParam("licence") @RequestParam boolean licence,
-        @ApiParam("year") @RequestParam boolean year
-        )
+        @ApiParam("licence") @RequestParam String licence,
+        @ApiParam("year") @RequestParam String year) throws JsonProcessingException
         {
-
-        Vehicle vehicle = new Vehicle();
-        vehicle.setBrand(brand);
-        vehicle.setModel(model);
-        vehicle.setLicence(licence);
-        vehicle.setYear(year);
-
-        Vehicle savedVehicle = vehicleRepository.save(vehicle);
-
-        return savedVehicle;
-    }
+            log.info("brand={}", brand);
+            log.info("model={}", model);
+            log.info("licence={}", licence);
+            log.info("year={}", year);
+            
+            Vehicle vehicle = new Vehicle();
+            vehicle.setBrand(brand);
+            vehicle.setModel(model);
+            vehicle.setLicence(licence);
+            vehicle.setYear(year);
+            Vehicle savedVehicle = vehicleRepository.save(vehicle);
+            
+            return savedVehicle;
+        }
 
     @ApiOperation(value = "Delete a vehicle")
     @PreAuthorize("hasRole('ROLE_ADMIN')")

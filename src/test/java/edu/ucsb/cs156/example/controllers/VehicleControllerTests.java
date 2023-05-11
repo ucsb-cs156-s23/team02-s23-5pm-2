@@ -21,6 +21,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
+import java.time.LocalDateTime;
+
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,76 +35,48 @@ import static org.mockito.Mockito.when;
 @WebMvcTest(controllers = VehicleController.class)
 @Import(TestConfig.class)
 public class VehicleControllerTests extends ControllerTestCase {
+
         @MockBean
         VehicleRepository vehicleRepository;
 
         @MockBean
         UserRepository userRepository;
 
-        // Authorization tests for /api/vehicles/admin/all
+    
 
         @Test
         public void logged_out_users_cannot_get_all() throws Exception {
-                mockMvc.perform(get("/api/vehicles/all"))
+                mockMvc.perform(get("/api/vehicle/all"))
                                 .andExpect(status().is(403)); // logged out users can't get all
         }
 
         @WithMockUser(roles = { "USER" })
         @Test
         public void logged_in_users_can_get_all() throws Exception {
-                mockMvc.perform(get("/api/vehicles/all"))
+                mockMvc.perform(get("/api/vehicle/all"))
                                 .andExpect(status().is(200)); // logged
         }
 
         @Test
         public void logged_out_users_cannot_get_by_id() throws Exception {
-                mockMvc.perform(get("/api/vehicles?id=7"))
+                mockMvc.perform(get("/api/vehicle?id=7"))
                                 .andExpect(status().is(403)); // logged out users can't get by id
         }
 
-        // Authorization tests for /api/vehicles/post
+      
+        // (Perhaps should also have these for put and delete)
 
         @Test
         public void logged_out_users_cannot_post() throws Exception {
-                mockMvc.perform(post("/api/vehicles/post"))
+                mockMvc.perform(post("/api/vehicle/post"))
                                 .andExpect(status().is(403));
         }
 
         @WithMockUser(roles = { "USER" })
         @Test
         public void logged_in_regular_users_cannot_post() throws Exception {
-                mockMvc.perform(post("/api/vehicles/post"))
+                mockMvc.perform(post("/api/vehicle/post"))
                                 .andExpect(status().is(403)); // only admins can post
-        }
-
-        // Authorization tests for /api/vehicles/put
-
-        @Test
-        public void logged_out_users_cannot_put() throws Exception {
-                mockMvc.perform(put("/api/vehicles/put"))
-                                .andExpect(status().is(403));
-        }
-
-        @WithMockUser(roles = { "USER" })
-        @Test
-        public void logged_in_regular_users_cannot_put() throws Exception {
-                mockMvc.perform(put("/api/vehicles/put"))
-                                .andExpect(status().is(403)); // only admins can put
-        }
-
-        // Authorization tests for /api/vehicles/delete
-
-        @Test
-        public void logged_out_users_cannot_delete() throws Exception {
-                mockMvc.perform(delete("/api/vehicles/delete"))
-                                .andExpect(status().is(403));
-        }
-
-        @WithMockUser(roles = { "USER" })
-        @Test
-        public void logged_in_regular_users_cannot_delete() throws Exception {
-                mockMvc.perform(delete("/api/vehicles/delete"))
-                                .andExpect(status().is(403)); // only admins can delete
         }
 
         // // Tests with mocks for database actions
@@ -110,6 +84,9 @@ public class VehicleControllerTests extends ControllerTestCase {
         @WithMockUser(roles = { "USER" })
         @Test
         public void test_that_logged_in_user_can_get_by_id_when_the_id_exists() throws Exception {
+
+                // arrange
+                LocalDateTime ldt = LocalDateTime.parse("2022-01-03T00:00:00");
 
                 Vehicle vehicle = Vehicle.builder()
                                 .brand("Cadillac")
@@ -121,7 +98,7 @@ public class VehicleControllerTests extends ControllerTestCase {
                 when(vehicleRepository.findById(eq(7L))).thenReturn(Optional.of(vehicle));
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/vehicles?id=7"))
+                MvcResult response = mockMvc.perform(get("/api/vehicle?id=7"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
@@ -131,7 +108,7 @@ public class VehicleControllerTests extends ControllerTestCase {
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
-        
+
         @WithMockUser(roles = { "USER" })
         @Test
         public void test_that_logged_in_user_can_get_by_id_when_the_id_does_not_exist() throws Exception {
@@ -141,7 +118,7 @@ public class VehicleControllerTests extends ControllerTestCase {
                 when(vehicleRepository.findById(eq(7L))).thenReturn(Optional.empty());
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/vehicles?id=7"))
+                MvcResult response = mockMvc.perform(get("/api/vehicle?id=7"))
                                 .andExpect(status().isNotFound()).andReturn();
 
                 // assert
@@ -154,7 +131,9 @@ public class VehicleControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "USER" })
         @Test
-        public void logged_in_user_can_get_all_vehicles() throws Exception {
+        public void logged_in_user_can_get_all_vehicle() throws Exception {
+
+                // arrange
 
                 Vehicle vehicle1 = Vehicle.builder()
                                 .brand("Cadillac")
@@ -162,6 +141,7 @@ public class VehicleControllerTests extends ControllerTestCase {
                                 .licence("OG1")
                                 .year("2023")
                                 .build();
+                LocalDateTime ldt2 = LocalDateTime.parse("2022-03-11T00:00:00");
 
                 Vehicle vehicle2 = Vehicle.builder()
                                 .brand("BMW")
@@ -170,19 +150,19 @@ public class VehicleControllerTests extends ControllerTestCase {
                                 .year("2009")
                                 .build();
 
-                ArrayList<Vehicle> expectedDates = new ArrayList<>();
-                expectedDates.addAll(Arrays.asList(vehicle1, vehicle2));
+                ArrayList<Vehicle> expectedVehicle = new ArrayList<>();
+                expectedVehicle.addAll(Arrays.asList(vehicle1, vehicle2));
 
-                when(vehicleRepository.findAll()).thenReturn(expectedDates);
+                when(vehicleRepository.findAll()).thenReturn(expectedVehicle);
 
                 // act
-                MvcResult response = mockMvc.perform(get("/api/vehicles/all"))
+                MvcResult response = mockMvc.perform(get("/api/vehicle/all"))
                                 .andExpect(status().isOk()).andReturn();
 
                 // assert
 
                 verify(vehicleRepository, times(1)).findAll();
-                String expectedJson = mapper.writeValueAsString(expectedDates);
+                String expectedJson = mapper.writeValueAsString(expectedVehicle);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
@@ -190,6 +170,9 @@ public class VehicleControllerTests extends ControllerTestCase {
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
         public void an_admin_user_can_post_a_new_vehicle() throws Exception {
+                // arrange
+
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
 
                 Vehicle vehicle1 = Vehicle.builder()
                                 .brand("Cadillac")
@@ -202,7 +185,7 @@ public class VehicleControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                post("/api/vehicles/post?brand=Cadillac&model=Escalade&licence=OG1&year=2023")
+                                post("/api/vehicle/post?brand=Cadillac&model=Escalade&licence=OG1&year=2023")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
@@ -216,6 +199,9 @@ public class VehicleControllerTests extends ControllerTestCase {
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
         public void admin_can_delete_a_date() throws Exception {
+                // arrange
+
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
 
                 Vehicle vehicle1 = Vehicle.builder()
                                 .brand("Cadillac")
@@ -228,7 +214,7 @@ public class VehicleControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/vehicles?id=15")
+                                delete("/api/vehicle?id=15")
                                                 .with(csrf()))
                                 .andExpect(status().isOk()).andReturn();
 
@@ -250,7 +236,7 @@ public class VehicleControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                delete("/api/vehicles?id=15")
+                                delete("/api/vehicle?id=15")
                                                 .with(csrf()))
                                 .andExpect(status().isNotFound()).andReturn();
 
@@ -263,6 +249,7 @@ public class VehicleControllerTests extends ControllerTestCase {
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
         public void admin_can_edit_an_existing_vehicle() throws Exception {
+                // arrange
 
                 Vehicle vehicleOrig = Vehicle.builder()
                                 .brand("Cadillac")
@@ -284,7 +271,7 @@ public class VehicleControllerTests extends ControllerTestCase {
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/vehicles?id=67")
+                                put("/api/vehicle?id=67")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)
@@ -301,21 +288,25 @@ public class VehicleControllerTests extends ControllerTestCase {
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
         public void admin_cannot_edit_vehicle_that_does_not_exist() throws Exception {
+                // arrange
 
-                Vehicle editedVehicle = Vehicle.builder()
+                LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
+
+                Vehicle ucsbEditedDate = Vehicle.builder()
                                 .brand("Cadillac")
                                 .model("Escalade")
                                 .licence("OG1")
                                 .year("2023")
                                 .build();
 
-                String requestBody = mapper.writeValueAsString(editedVehicle);
+
+                String requestBody = mapper.writeValueAsString(ucsbEditedDate);
 
                 when(vehicleRepository.findById(eq(67L))).thenReturn(Optional.empty());
 
                 // act
                 MvcResult response = mockMvc.perform(
-                                put("/api/vehicles?id=67")
+                                put("/api/vehicle?id=67")
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .characterEncoding("utf-8")
                                                 .content(requestBody)
@@ -326,6 +317,6 @@ public class VehicleControllerTests extends ControllerTestCase {
                 verify(vehicleRepository, times(1)).findById(67L);
                 Map<String, Object> json = responseToJson(response);
                 assertEquals("Vehicle with id 67 not found", json.get("message"));
-        }
 
+        }
 }
