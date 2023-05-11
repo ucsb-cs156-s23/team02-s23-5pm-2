@@ -167,10 +167,10 @@ public class RestaurantControllerTests extends ControllerTestCase {
                                 .hasTakeOut(true)
                                 .build();
 
-                ArrayList<Restaurant> expectedDates = new ArrayList<>();
-                expectedDates.addAll(Arrays.asList(restaurant1, restaurant2));
+                ArrayList<Restaurant> expectedRestaurants = new ArrayList<>();
+                expectedRestaurants.addAll(Arrays.asList(restaurant1, restaurant2));
 
-                when(restaurantRepository.findAll()).thenReturn(expectedDates);
+                when(restaurantRepository.findAll()).thenReturn(expectedRestaurants);
 
                 // act
                 MvcResult response = mockMvc.perform(get("/api/restaurants/all"))
@@ -179,7 +179,7 @@ public class RestaurantControllerTests extends ControllerTestCase {
                 // assert
 
                 verify(restaurantRepository, times(1)).findAll();
-                String expectedJson = mapper.writeValueAsString(expectedDates);
+                String expectedJson = mapper.writeValueAsString(expectedRestaurants);
                 String responseString = response.getResponse().getContentAsString();
                 assertEquals(expectedJson, responseString);
         }
@@ -211,7 +211,7 @@ public class RestaurantControllerTests extends ControllerTestCase {
 
         @WithMockUser(roles = { "ADMIN", "USER" })
         @Test
-        public void admin_can_delete_a_date() throws Exception {
+        public void admin_can_delete_a_restaurant() throws Exception {
 
                 Restaurant restaurant1 = Restaurant.builder()
                                 .name("Zocalo")

@@ -3,7 +3,6 @@ package edu.ucsb.cs156.example.controllers;
 import edu.ucsb.cs156.example.entities.Restaurant;
 import edu.ucsb.cs156.example.errors.EntityNotFoundException;
 import edu.ucsb.cs156.example.repositories.RestaurantRepository;
-import edu.ucsb.cs156.example.repositories.UCSBDateRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -36,7 +35,7 @@ public class RestaurantController extends ApiController {
     @ApiOperation(value = "List all restaurants")
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/all")
-    public Iterable<Restaurant> allCommonss() {
+    public Iterable<Restaurant> allRestaurants() {
         Iterable<Restaurant> restaurants = restaurantRepository.findAll();
         return restaurants;
     }
@@ -54,7 +53,7 @@ public class RestaurantController extends ApiController {
     @ApiOperation(value = "Create a new restaurant")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/post")
-    public Restaurant postCommons(
+    public Restaurant postRestaurants(
         @ApiParam("name") @RequestParam String name,
         @ApiParam("location") @RequestParam String location,
         @ApiParam("hasTakeOut") @RequestParam boolean hasTakeOut
@@ -83,10 +82,10 @@ public class RestaurantController extends ApiController {
         return genericMessage("Restaurant with id %s deleted".formatted(id));
     }
 
-    @ApiOperation(value = "Update a single commons")
+    @ApiOperation(value = "Update a single restaurant")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("")
-    public Restaurant updateCommons(
+    public Restaurant updateRestaurant(
             @ApiParam("id") @RequestParam Long id,
             @RequestBody @Valid Restaurant incoming) {
 
