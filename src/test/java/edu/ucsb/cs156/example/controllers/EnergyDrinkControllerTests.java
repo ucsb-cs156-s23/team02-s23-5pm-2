@@ -286,7 +286,7 @@ public class EnergyDrinkControllerTests extends ControllerTestCase {
 
                 LocalDateTime ldt1 = LocalDateTime.parse("2022-01-03T00:00:00");
 
-                EnergydDrink ucsbEditedDate = EnergyDrink.builder()
+                EnergyDrink ucsbEditedDate = EnergyDrink.builder()
                                 .name("Red Bull")
                                 .flavor("Peach")
                                 .calories("150")
